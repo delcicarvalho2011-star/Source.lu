@@ -1,0 +1,123 @@
+--[[ 
+    PROJECT: KITSUNE UI (Educational Mockup)
+    Tema: Anime Aesthetic
+    Linguagem: Lua
+    Descrição: Sistema de gerenciamento de estados para Menu UI
+]]
+
+local KitsuneMenu = {}
+KitsuneMenu.__index = KitsuneMenu
+
+-- Configurações de Estilo (Tema Anime)
+local Theme = {
+    MainColor = {R=255, G=105, B=180}, -- Hot Pink
+    Secondary = {R=147, G=112, B=219}, -- Medium Purple
+    Background = {R=25, G=25, B=35},   -- Dark Slate
+    TextFont = "AnimeAce",
+}
+
+-- Inicialização do Menu
+function KitsuneMenu.new()
+    local self = setmetatable({}, KitsuneMenu)
+    
+    -- Estado atual da UI
+    self.isOpen = true
+    self.currentTab = "Combate" -- Aba inicial
+    
+    -- Armazenamento dos estados das funcionalidades (Flags)
+    self.config = {
+        combat = {
+            aimbotEnabled = false,
+            targetPart = "Tronco" -- Cabeça, Tronco, Pernas
+        },
+        visual = {
+            espBox = false,
+            espSkeleton = false,
+            espWeapon = false
+        },
+        defense = {
+            antiAim = false,
+            damageNullify = false
+        }
+    }
+    
+    return self
+end
+
+-- --- Sistema de Abas ---
+
+function KitsuneMenu:SwitchTab(tabName)
+    local validTabs = {["Combate"]=true, ["Visual"]=true, ["Defesa"]=true}
+    
+    if validTabs[tabName] then
+        self.currentTab = tabName
+        print(string.format("[UI] Aba alterada para: >> %s <<", tabName))
+    else
+        print("[Erro] Aba inválida.")
+    end
+end
+
+-- --- Sistema de Toggles (Ativação) ---
+
+function KitsuneMenu:ToggleFeature(category, feature)
+    if self.config[category] and self.config[category][feature] ~= nil then
+        -- Inverte o valor booleano (true <-> false)
+        self.config[category][feature] = not self.config[category][feature]
+        
+        local status = self.config[category][feature] and "ATIVADO" or "DESATIVADO"
+        print(string.format("[Config] %s -> %s: %s", category:upper(), feature, status))
+        
+        -- Apenas para demonstração educativa de callback
+        self:OnFeatureChanged(feature, self.config[category][feature])
+    else
+        print("[Erro] Funcionalidade não encontrada.")
+    end
+end
+
+-- Função que simularia a chamada lógica (Placeholder seguro)
+function KitsuneMenu:OnFeatureChanged(feature, state)
+    if feature == "aimbotEnabled" and state then
+        print(" > Sistema de rastreamento iniciado (Simulação)")
+    elseif feature == "targetPart" then
+        print(" > Foco de mira atualizado")
+    end
+end
+
+-- --- Seleção de Alvos (Dropdown logic) ---
+
+function KitsuneMenu:SetTargetPart(partName)
+    local validParts = {["Cabeça"]=true, ["Tronco"]=true, ["Pernas"]=true}
+    
+    if validParts[partName] then
+        self.config.combat.targetPart = partName
+        print(string.format("[Combate] Prioridade de mira definida para: %s", partName))
+    else
+        print("[Erro] Parte do corpo inválida.")
+    end
+end
+
+-- ==========================================
+-- EXECUTANDO A SIMULAÇÃO (Testando a Lógica)
+-- ==========================================
+
+local menu = KitsuneMenu.new()
+
+print("--- INICIANDO KITSUNE UI ---")
+
+-- 1. Alternar para aba Visual
+menu:SwitchTab("Visual")
+
+-- 2. Ativar ESP Box e Skeleton
+menu:ToggleFeature("visual", "espBox")
+menu:ToggleFeature("visual", "espSkeleton")
+
+-- 3. Voltar para aba Combate e configurar Aimbot
+menu:SwitchTab("Combate")
+menu:ToggleFeature("combat", "aimbotEnabled")
+menu:SetTargetPart("Cabeça")
+
+-- 4. Tentar ativar Defesa
+menu:SwitchTab("Defesa")
+menu:ToggleFeature("defense", "antiAim")
+
+print("--- FIM DA SIMULAÇÃO ---")
